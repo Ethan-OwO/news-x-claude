@@ -28,7 +28,7 @@ FEW_SHOT_EXAMPLES = [
 
 class StoryAnalysis(BaseModel):
     topic: str
-    company: str
+    company: str | None = None
     sentiment: str
     technical: bool
 
@@ -43,7 +43,7 @@ class StoryAnalysis(BaseModel):
         technical_str = str(self.technical)
         return (
             f'[{index}] "{title}"\n'
-            f"    → topic: {self.topic} | company: {self.company} "
+            f"    → topic: {self.topic} | company: {self.company or 'None'} "
             f"| sentiment: {self.sentiment} | technical: {technical_str}"
         )
 
@@ -88,8 +88,6 @@ def extract_story(title: str, url: str) -> StoryAnalysis | str:
         )
         raw = "{" + response.content[0].text.strip()
         data = json.loads(raw)
-        if data.get("company") is None:
-            data["company"] = "None"
         return StoryAnalysis(**data)
     except json.JSONDecodeError as e:
         return f"[ERROR] JSON parse failed: {e}"
